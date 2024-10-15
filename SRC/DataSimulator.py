@@ -1,32 +1,27 @@
-import numpy as np
 import pandas as pd
+import numpy as np
+
 
 class DataSimulator:
-    def __init__(self, random_state=None, population=1e6, variance=1000, initial_pharma_stock=1e6, restock_amount=1e6, max_pharma_stock=1e6):
-        self.random_state = random_state  # Seed for reproducibility
-        self.population = population
-        self.variance = variance
-        self.initial_pharma_stock = initial_pharma_stock
-        self.restock_amount = restock_amount
-        self.max_pharma_stock = max_pharma_stock  # Maximum storage capacity
-
-        # Initialize ingredient stocks
-        self.ingredient_stocks = {
-            'ingredient_a': 4.5e6,
-            'ingredient_b': 4.5e6,
-            'ingredient_c': 4.5e6
-        }
-
-        # Initialize production cycle settings
-        self.production_cycle = {
-            'ingredient_a': 0.5,  # Reduced units needed per production
-            'ingredient_b': 1.5,  # Increased units needed per production
-            'ingredient_c': 0.75
-        }
-
-        # Initialize state variables
-        self.production_increase = False
+    def __init__(self, random_state=None):
+        self.random_state = random_state
+        self.initial_pharma_stock = 1000000  # Example initial stock
+        self.max_pharma_stock = 2000000  # Example max stock
+        self.population = 1000000  # Example population
+        self.variance = 10000  # Example variance
+        self.restock_amount = 50000  # Example restock amount
         self.production_delay = 0
+        self.production_increase = False
+        self.ingredient_stocks = {
+            'ingredient_a': 100000,
+            'ingredient_b': 100000,
+            'ingredient_c': 100000
+        }
+        self.production_cycle = {
+            'ingredient_a': 1,
+            'ingredient_b': 1,
+            'ingredient_c': 1
+        }
 
     def simulate_sales_and_stock(self, months_to_simulate=36):
         np.random.seed(self.random_state)  # Set the random seed for reproducibility
@@ -65,18 +60,22 @@ class DataSimulator:
             total_sales.append(monthly_sales / 1e6)
             total_stock.append(stock / 1e6)
 
-            # Determine shortage status
+            # Determine shortage status on a scale of 1-10
             if stock < (self.max_pharma_stock * 0.1):  # Extreme shortage threshold
-                shortage_status.append(3)  # Extreme shortage
+                shortage_status.append(10)  # Extreme shortage
+            elif stock < (self.max_pharma_stock * 0.2):
+                shortage_status.append(8)
             elif stock < (self.max_pharma_stock * 0.3):  # Moderate shortage threshold
-                shortage_status.append(2)  # Moderate shortage
+                shortage_status.append(6)  # Moderate shortage
+            elif stock < (self.max_pharma_stock * 0.4):
+                shortage_status.append(4)
             elif stock < (self.max_pharma_stock * 0.5):  # Minor shortage threshold
-                shortage_status.append(1)  # Minor shortage
+                shortage_status.append(2)  # Minor shortage
             else:
-                shortage_status.append(0)  # No shortage
+                shortage_status.append(1)  # No shortage
 
             # Handle production and restocking
-            if shortage_status[-1] > 0:  # If there's a shortage
+            if shortage_status[-1] > 1:  # If there's a shortage
                 if self.production_delay == 0:
                     self.production_increase = True  # Trigger production increase
                     self.production_delay = np.random.randint(1, 4)  # Set reaction delay of 1-3 months
@@ -120,7 +119,8 @@ class DataSimulator:
 
                         # Increase restocking for ingredients
                         self.ingredient_stocks['ingredient_a'] += self.restock_amount * 1.0
-                        self.ingredient_stocks['ingredient_b'] += self.restock_amount * 3.5  # Increased restock amount for ingredient_b
+                        self.ingredient_stocks[
+                            'ingredient_b'] += self.restock_amount * 3.5  # Increased restock amount for ingredient_b
                         self.ingredient_stocks['ingredient_c'] += self.restock_amount * 1.0
                     else:
                         last_restock_amounts.append(0)  # No production if ingredients are insufficient
@@ -150,5 +150,8 @@ class DataSimulator:
         # Set display options to show all columns
         pd.set_option('display.max_columns', None)
 
-        # Assuming `df` is your DataFrame
+        # Print the DataFrame
         print(df)
+
+        # Return the DataFrame
+        return df
