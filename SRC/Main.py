@@ -1,6 +1,8 @@
 # python
 from DataSimulator import DataSimulator
 from PredictMed import train_and_evaluate_models
+from Plotter import Plotter
+
 
 def main():
     # Initialize the simulator with a specific random state for reproducibility
@@ -12,6 +14,10 @@ def main():
     # Display the simulation results
     print("Gesamte Simulationsergebnisse:\n")
     print(df)
+
+    # Plot the shortage status over time
+    plotter = Plotter(df)
+    plotter.plot_shortage_status()
 
     # Train and evaluate models
     y_test, y_pred_linear, y_pred_rf = train_and_evaluate_models(df)

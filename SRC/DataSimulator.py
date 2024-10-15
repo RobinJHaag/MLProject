@@ -1,21 +1,21 @@
-import pandas as pd
+# python
 import numpy as np
-
+import pandas as pd
 
 class DataSimulator:
     def __init__(self, random_state=None):
         self.random_state = random_state
-        self.initial_pharma_stock = 1000000  # Example initial stock
-        self.max_pharma_stock = 2000000  # Example max stock
+        self.initial_pharma_stock = 5000000  # Increased initial stock
+        self.max_pharma_stock = 10000000  # Increased max stock
         self.population = 1000000  # Example population
-        self.variance = 10000  # Example variance
-        self.restock_amount = 50000  # Example restock amount
+        self.variance = 5000  # Reduced variance
+        self.restock_amount = 200000  # Increased restock amount
         self.production_delay = 0
         self.production_increase = False
         self.ingredient_stocks = {
-            'ingredient_a': 100000,
-            'ingredient_b': 100000,
-            'ingredient_c': 100000
+            'ingredient_a': 500000,
+            'ingredient_b': 500000,
+            'ingredient_c': 500000
         }
         self.production_cycle = {
             'ingredient_a': 1,
@@ -51,7 +51,7 @@ class DataSimulator:
             # Simulate seasonal demand variation
             seasonality_factor = (seasonality[month_name] - 5) * 0.02
             seasonal_factor = 1 + seasonality_factor
-            monthly_demand = (self.population * 0.006 * 30 * seasonal_factor) + np.random.normal(0, self.variance)
+            monthly_demand = (self.population * 0.003 * 30 * seasonal_factor) + np.random.normal(0, self.variance)
             monthly_demand *= 0.95  # Decrease demand by 5%
             monthly_sales = min(stock, monthly_demand)  # Sales cannot exceed stock
             stock -= monthly_sales  # Update stock after sales
@@ -64,13 +64,21 @@ class DataSimulator:
             if stock < (self.max_pharma_stock * 0.1):  # Extreme shortage threshold
                 shortage_status.append(10)  # Extreme shortage
             elif stock < (self.max_pharma_stock * 0.2):
+                shortage_status.append(9)
+            elif stock < (self.max_pharma_stock * 0.3):  # Severe shortage threshold
                 shortage_status.append(8)
-            elif stock < (self.max_pharma_stock * 0.3):  # Moderate shortage threshold
-                shortage_status.append(6)  # Moderate shortage
             elif stock < (self.max_pharma_stock * 0.4):
+                shortage_status.append(7)
+            elif stock < (self.max_pharma_stock * 0.5):  # High shortage threshold
+                shortage_status.append(6)
+            elif stock < (self.max_pharma_stock * 0.6):
+                shortage_status.append(5)
+            elif stock < (self.max_pharma_stock * 0.7):  # Moderate shortage threshold
                 shortage_status.append(4)
-            elif stock < (self.max_pharma_stock * 0.5):  # Minor shortage threshold
-                shortage_status.append(2)  # Minor shortage
+            elif stock < (self.max_pharma_stock * 0.8):
+                shortage_status.append(3)
+            elif stock < (self.max_pharma_stock * 0.9):  # Low shortage threshold
+                shortage_status.append(2)
             else:
                 shortage_status.append(1)  # No shortage
 
@@ -119,8 +127,7 @@ class DataSimulator:
 
                         # Increase restocking for ingredients
                         self.ingredient_stocks['ingredient_a'] += self.restock_amount * 1.0
-                        self.ingredient_stocks[
-                            'ingredient_b'] += self.restock_amount * 3.5  # Increased restock amount for ingredient_b
+                        self.ingredient_stocks['ingredient_b'] += self.restock_amount * 1.0
                         self.ingredient_stocks['ingredient_c'] += self.restock_amount * 1.0
                     else:
                         last_restock_amounts.append(0)  # No production if ingredients are insufficient
