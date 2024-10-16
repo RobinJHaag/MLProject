@@ -1,16 +1,37 @@
+# python
 from DataSimulator import DataSimulator
-from PredictMed import PredictMed
+from PredictMed import train_and_evaluate_models
+from Plotter import Plotter
 
 
 def main():
-    # Erstelle den DataSimulator für die zentrale Lagerstelle
-    data_simulator = DataSimulator(population=8500000, initial_stock=5000000, restock_amount=5000000, variance=0.2)
+    # Initialize the simulator with a specific random state for reproducibility
+    simulator = DataSimulator(random_state=42, restock_interval=6)
 
-    # Simuliere monatliche Verkaufszahlen, Lagerbestände und Knappheitsstufen
-    df_aggregated = data_simulator.simulate_sales_and_stock(months_to_simulate=12)
+    # Simulate for 36 months
+    df = simulator.simulate_sales_and_stock(months_to_simulate=48)
 
-    # Ausgabe der simulierten und aggregierten Daten
-    print(df_aggregated.head(12))  # Zeige die ersten 12 Monate
+    # Display the simulation results
+    print("Gesamte Simulationsergebnisse:\n")
+    print(df)
+
+    # Plot the shortage status over time
+    plotter = Plotter(df)
+    plotter.plot_shortage_status()
+
+    """
+    # Train and evaluate models
+    y_test, y_pred_linear, y_pred_rf = train_and_evaluate_models(df)
+
+    # Display the predictions
+    print("\nActual vs Predicted (Linear Regression):")
+    for actual, pred in zip(y_test, y_pred_linear):
+        print(f"Actual: {actual}, Predicted: {pred}")
+
+    print("\nActual vs Predicted (Random Forest Regression):")
+    for actual, pred in zip(y_test, y_pred_rf):
+        print(f"Actual: {actual}, Predicted: {pred}")
+    """
 
 
 if __name__ == "__main__":
