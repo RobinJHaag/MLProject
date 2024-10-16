@@ -24,11 +24,11 @@ class DataSimulator:
             'ingredient_b': 1,
             'ingredient_c': 1
         }
-        self.ingredient_restock_rate = 120000  # Slightly boosted restock rate
+        self.ingredient_restock_rate = 120000  #Restock Rate
         self.boost_ingredient_restock = False
-        self.boost_duration = 3  # Duration for restocking boost after a shortage
+        self.boost_duration = 3  # Restock Boost Duration in Months
         self.boost_counter = 0
-        self.ingredient_ramp_up_delay = 4  # 3-month delay for ingredient restocking ramp-up
+        self.ingredient_ramp_up_delay = 4  # Delay in Months for ingredient restocking ramp-up
 
         self.ingredient_restock_delays = {
             'ingredient_a': -1,
@@ -45,7 +45,7 @@ class DataSimulator:
             for ing in self.production_cycle
         )
 
-    def simulate_sales_and_stock(self, months_to_simulate=36):
+    def simulate_sales_and_stock(self, months_to_simulate=48):
         """
         Simulates sales and stock over a specified period.
         Sales amounts vary based on seasonality and random demand spikes.
@@ -112,7 +112,7 @@ class DataSimulator:
             When a delay occurs, the ingredient is restocked more slowly until the delay ends.
             """
             for ingredient in self.ingredient_stocks:
-                if np.random.random() < 0.1:
+                if np.random.random() < 0.05:
                     print(f"Warning: Restocking failure for {ingredient} in {month_name} {dates[month].year}!")
                     self.ingredient_stocks[ingredient] -= self.ingredient_restock_rate * np.random.uniform(0.4, 0.9)
                     self.ingredient_restock_delays[ingredient] = month + self.ingredient_ramp_up_delay
