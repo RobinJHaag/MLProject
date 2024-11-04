@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from pandas.plotting import table
 
 
 class Plotter:
@@ -15,3 +16,15 @@ class Plotter:
         plt.xticks(rotation=45)
         plt.tight_layout()
         plt.show()
+
+    def plot_dataframe_as_image(self):
+        fig, ax = plt.subplots(figsize=(12, 8))
+        ax.axis("tight")
+        ax.axis("off")
+
+        tbl = table(ax, self.df, loc="center", cellLoc="center", colWidths=[0.1] * len(self.df.columns))
+        tbl.auto_set_font_size(False)
+        tbl.set_fontsize(10)
+        tbl.scale(1.2, 1.2)
+
+        plt.show()  # Display the image directly instead of saving
