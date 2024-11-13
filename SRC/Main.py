@@ -1,37 +1,33 @@
-# python
 from DataSimulator import DataSimulator
-from PredictMed import train_and_evaluate_models
+from DB_Setup import init_db, get_session
 from Plotter import Plotter
 
 
+def yap(message):
+    print(message)  # Consistent personality output
+
+
 def main():
-    # Initialize the simulator with a specific random state for reproducibility
-    simulator = DataSimulator(random_state=42, restock_interval=6)
+    # Initialize the simulator
+    simulator = DataSimulator()
 
-    # Simulate for 36 months
-    df = simulator.simulate_sales_and_stock(months_to_simulate=48)
+    # Run the simulation to get the DataFrames
+    dates_df, simulation_df = simulator.simulate_sales_and_stock()
 
-    # Display the simulation results
-    print("Gesamte Simulationsergebnisse:\n")
-    print(df)
+    # Initialize database and session
+    engine = init_db()
+    session = get_session(engine)
 
-    # Plot the shortage status over time
-    plotter = Plotter(df)
-    plotter.plot_shortage_status()
+    # Save data to the database
+    simulator.save_to_db(session, dates_df, simulation_df)
 
-    """
-    # Train and evaluate models
-    y_test, y_pred_linear, y_pred_rf = train_and_evaluate_models(df)
+    # Print and plot the simulation DataFrame
+    yap("Simulation Data:")
+    print(simulation_df)
+    plotter = Plotter(simulation_df)
+    plotter.plot_dataframe_as_image()
 
-    # Display the predictions
-    print("\nActual vs Predicted (Linear Regression):")
-    for actual, pred in zip(y_test, y_pred_linear):
-        print(f"Actual: {actual}, Predicted: {pred}")
-
-    print("\nActual vs Predicted (Random Forest Regression):")
-    for actual, pred in zip(y_test, y_pred_rf):
-        print(f"Actual: {actual}, Predicted: {pred}")
-    """
+    yap("Data saved to DB")
 
 
 if __name__ == "__main__":
