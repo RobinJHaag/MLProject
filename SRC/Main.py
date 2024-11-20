@@ -1,7 +1,8 @@
-from DataSimulator import DataSimulator
+from DataSimulator import DataSimulator, save_to_db
 from DB_Setup import init_db, get_session
 from Plotter import Plotter
 from utils import yap
+
 
 def main():
     # Initialize the simulator
@@ -13,9 +14,6 @@ def main():
     # Initialize database and session
     engine = init_db()
     session = get_session(engine)
-
-    # Save data to the database
-    simulator.save_to_db(session, dates_df, simulation_df)
 
     # Print and plot the simulation DataFrame
     yap("Simulation Data:")
