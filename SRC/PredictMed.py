@@ -6,11 +6,6 @@ from sklearn.metrics import mean_squared_error
 
 
 def train_and_evaluate_models(df):
-    from sklearn.model_selection import train_test_split
-    from sklearn.linear_model import LinearRegression
-    from sklearn.ensemble import RandomForestRegressor
-    from sklearn.metrics import mean_squared_error
-
     # Define features and target variable
     X = df[['sales', 'stock', 'last_restock_amount', 'days_since_last_restock', 'ingredient_a_stock', 'ingredient_b_stock', 'ingredient_c_stock']]
     y = df['shortage_status']

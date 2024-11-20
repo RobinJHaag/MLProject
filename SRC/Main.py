@@ -1,11 +1,7 @@
 from DataSimulator import DataSimulator
 from DB_Setup import init_db, get_session
 from Plotter import Plotter
-
-
-def yap(message):
-    print(message)  # Consistent personality output
-
+from utils import yap
 
 def main():
     # Initialize the simulator
