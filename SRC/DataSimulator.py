@@ -103,8 +103,8 @@ class DataSimulator:
                 self.base_restock_amount + np.random.normal(0, self.production_variance),
                 self.max_production_capacity
             )
-            if month - last_prod_issue <= 2:
-                production_output *= 0.75  # Reduce output temporarily after a production issue
+            if month - last_prod_issue <= 1:
+                production_output *= 0.9  # Reduce output by 10% temporarily after a production issue
             production_output = max(0, production_output)
 
             # Restock and update stocks
