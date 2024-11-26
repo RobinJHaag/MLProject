@@ -27,14 +27,15 @@ def save_to_db(session, dates_df, simulation_df):
             time_since_last_shortage_event=row['time_since_last_shortage_event'],
             months_since_prod_issue=row['months_since_prod_issue'],
             production_to_demand_ratio=row['production_to_demand_ratio'],
-            cumulative_shortages=row['cumulative_shortages']
+            cumulative_shortages=row['cumulative_shortages'],
+            shortage_level=row['shortage_level']  # Added shortage_level
         ))
     session.commit()
     yap("Simulation data saved to DB")
 
 
 class DataSimulator:
-    def __init__(self, random_state=None, restock_interval=6, base_restock_amount=550000, months_to_simulate=48):
+    def __init__(self, random_state=None, restock_interval=6, base_restock_amount=7600000, months_to_simulate=48):
         self.random_state = random_state
         self.restock_interval = restock_interval
         self.base_restock_amount = base_restock_amount
@@ -42,7 +43,7 @@ class DataSimulator:
         self.initial_pharma_stock = 5000000
         self.max_pharma_stock = 10000000
         self.population = 1000000
-        self.variance = 300000  # Variance for sales
+        self.variance = 200000  # Variance for sales
         self.production_variance = 150000  # Variance for production
         self.wirkstoff_stock = 5000000
         self.production_cycle = 1
@@ -60,9 +61,9 @@ class DataSimulator:
 
         # Seasonality factors to simulate monthly demand variations.
         seasonality = {
-            'January': 9, 'February': 8, 'March': 7, 'April': 5, 'May': 2,
-            'June': 2, 'July': 3, 'August': 4, 'September': 5,
-            'October': 7, 'November': 8, 'December': 10
+            'January': 1.2, 'February': 1.1, 'March': 1.0, 'April': 0.9, 'May': 0.8,
+            'June': 0.8, 'July': 0.85, 'August': 0.9, 'September': 1.0,
+            'October': 1.1, 'November': 1.2, 'December': 1.3
         }
 
         # Generate dates for simulation
@@ -75,6 +76,7 @@ class DataSimulator:
         stock_to_demand_ratio, time_since_last_shortage_event = [], []
         months_since_prod_issue, cumulative_shortages = [], 0
         production_to_demand_ratio = []
+        shortage_levels = []  # To store shortage levels
 
         # Initial state variables
         stock = self.initial_pharma_stock
@@ -82,10 +84,16 @@ class DataSimulator:
         last_shortage_event = -1
         last_prod_issue = -1
 
+        # Variables for production boost logic
+        boost_active = False
+        boost_scheduled = False
+        boost_start_month = None
+        boost_end_month = None
+
         # Simulate month by month
         for month in range(self.simulation_time_span):
             month_name = dates[month].strftime('%B')
-            seasonal_factor = 1 + ((seasonality[month_name] - 5) * 0.1)
+            seasonal_factor = seasonality[month_name]
 
             # Calculate demand with seasonality and variance
             monthly_demand = (self.population * 0.005 * 30 * seasonal_factor) + np.random.normal(0, self.variance)
@@ -98,14 +106,29 @@ class DataSimulator:
             else:
                 demand_spike_indicator.append(0)
 
-            # Calculate production with variance and handle production issues
-            production_output = min(
-                self.base_restock_amount + np.random.normal(0, self.production_variance),
-                self.max_production_capacity
-            )
+            # Update boost status
+            if boost_scheduled and month >= boost_start_month:
+                boost_active = True
+            if boost_active and month > boost_end_month:
+                boost_active = False
+                boost_scheduled = False
+
+            # Adjust base restock amount based on boost
+            if boost_active:
+                adjusted_base_restock_amount = self.base_restock_amount * 1.15
+            else:
+                adjusted_base_restock_amount = self.base_restock_amount
+
+            # Calculate production with variance
+            production_output = adjusted_base_restock_amount + np.random.normal(0, adjusted_base_restock_amount * 0.1)
+            production_output = max(0, production_output)
+
+            # Apply production issue reduction
             if month - last_prod_issue <= 1:
                 production_output *= 0.9  # Reduce output by 10% temporarily after a production issue
-            production_output = max(0, production_output)
+
+            # Limit to max production capacity
+            production_output = min(production_output, self.max_production_capacity)
 
             # Restock and update stocks
             if month % self.restock_interval == 0:
@@ -116,8 +139,11 @@ class DataSimulator:
             else:
                 last_restock_amounts.append(0)
 
-            # Update sales and stock levels
-            monthly_sales = min(stock, monthly_demand)
+            # Apply sales guardrail
+            max_sales = stock * 0.25 if stock < self.max_pharma_stock * 0.85 else stock
+            min_sales = stock * 0.01  # Ensure sales are at least 2% of current stock
+            monthly_sales = min(stock, monthly_demand, max_sales)
+            monthly_sales = max(monthly_sales, min_sales)  # Apply the minimum sales guardrail
             stock -= monthly_sales
             total_sales.append(monthly_sales / 1e6)
             total_stock.append(stock / 1e6)
@@ -133,6 +159,17 @@ class DataSimulator:
 
             # Update shortage status
             shortage_status.append(9 if stock < self.max_pharma_stock * 0.2 else 1)
+
+            # Calculate shortage level from 1 to 10
+            shortage_level = int((1 - (stock / self.max_pharma_stock)) * 9) + 1
+            shortage_level = min(max(shortage_level, 1), 10)
+            shortage_levels.append(shortage_level)
+
+            # Schedule production boost if shortage level is 7 or higher
+            if shortage_level >= 7 and not boost_active and not boost_scheduled:
+                boost_start_month = month + 2
+                boost_end_month = boost_start_month + 1  # Boost lasts for 2 months
+                boost_scheduled = True
 
             # Update months since last production issue
             if np.random.random() < 0.05:  # Production issue probability
@@ -156,7 +193,8 @@ class DataSimulator:
             ],
             'months_since_prod_issue': months_since_prod_issue,
             'production_to_demand_ratio': production_to_demand_ratio,
-            'cumulative_shortages': [cumulative_shortages] * self.simulation_time_span
+            'cumulative_shortages': [cumulative_shortages] * self.simulation_time_span,
+            'shortage_level': shortage_levels  # Include shortage level in the DataFrame
         })
 
         return dates_df, simulation_df
