@@ -1,15 +1,17 @@
-Pharmazeutische Produktions- und Vertriebssimulation
+# Pharmazeutische Produktions- und Vertriebssimulation
 Diese Simulation modelliert aus der Perspektive des Schweizer Staates die Produktion, den Verkauf und das Bestandsmanagement eines einzelnen Medikaments auf nationaler Ebene über einen Zeitraum von 48 Monaten. Sie dient als Prototyp, um die nationale Sicht auf ein Medikament zu simulieren und soll dazu beitragen, Engpässe frühzeitig zu erkennen und effektiver darauf reagieren zu können.
 
 Das Ziel ist es, dem Schweizer Staat mehr Handlungsraum zu bieten, indem mithilfe von maschinellem Lernen zukünftige Knappheiten vorhergesagt werden. Dadurch können Maßnahmen früher eingeleitet und die Versorgungssicherheit der Bevölkerung verbessert werden.
 
-Ziele der Simulation
+# Ziele der Simulation
 Nationale Bestandsübersicht: Bereitstellung eines umfassenden Überblicks über die Verfügbarkeit eines wichtigen Medikaments in der Schweiz.
 Nachfragevorhersage: Simulation der monatlichen Nachfrage unter Berücksichtigung saisonaler Schwankungen und zufälliger Nachfragespitzen.
 Produktionsplanung: Modellierung der Produktionsprozesse unter Berücksichtigung von Produktionskapazitäten, Wirkstoffverfügbarkeit und möglichen Produktionsproblemen.
 Engpassanalyse und Prävention: Identifizierung potenzieller Engpässe und Unterstützung des Schweizer Staates bei der frühzeitigen Planung von Gegenmaßnahmen.
 Unterstützung durch maschinelles Lernen: Einsatz eines ML-Modells, um Knappheiten vorherzusagen und dem Schweizer Staat proaktive Entscheidungen zu ermöglichen.
-Hauptkomponenten der Simulation
+
+
+# Hauptkomponenten der Simulation
 1. Nachfragemodellierung
 Die monatliche Nachfrage wird wie folgt berechnet:
 
@@ -17,6 +19,7 @@ Basisnachfrage: Abhängig von der Schweizer Bevölkerung und einem festen Prozen
 Saisonale Schwankungen: Monatliche saisonale Faktoren erhöhen oder verringern die Basisnachfrage.
 Varianz: Ein zufälliger Wert wird hinzugefügt, um natürliche Schwankungen in der Nachfrage zu simulieren.
 Nachfragespitzen: Mit einer bestimmten Wahrscheinlichkeit tritt eine Nachfragespitze auf, die die Nachfrage verdoppelt, um unerwartete Ereignisse wie Krankheitsausbrüche zu simulieren.
+
 2. Produktionsmodellierung
 Produktionskapazität: Es gibt eine maximale Produktionskapazität pro Monat, die nicht überschritten werden kann.
 Basis-Restock-Menge: Die Menge, die alle festgelegten Restock-Intervalle produziert wird.
@@ -24,18 +27,22 @@ Produktionsvarianz: Ein zufälliger Wert wird hinzugefügt, um Schwankungen in d
 Produktionsprobleme: Mit einer bestimmten Wahrscheinlichkeit tritt ein Produktionsproblem auf, das die Produktion reduziert.
 Wirkstoffverbrauch: Für die Produktion wird eine bestimmte Menge Wirkstoff pro Produktionseinheit verbraucht.
 Wirkstoffverfügbarkeit: Wenn nicht genügend Wirkstoff verfügbar ist, wird die Produktion entsprechend reduziert.
-3. Bestandsmanagement
+
+4. Bestandsmanagement
 Lagerbestand: Verfolgt den aktuellen Lagerbestand des Medikaments auf nationaler Ebene.
 Wirkstoffbestand: Verfolgt den aktuellen Bestand des Wirkstoffs.
 Restock-Intervalle: Das Medikament und der Wirkstoff werden in festgelegten Intervallen wieder aufgefüllt.
 Restock-Mengen: Die Mengen, die bei jedem Restock produziert bzw. gekauft werden.
 Verkaufs-Guardrails: Legen die minimalen und maximalen Verkaufszahlen fest, um unrealistische Verkäufe zu vermeiden.
-4. Engpassanalyse und Prävention
+
+6. Engpassanalyse und Prävention
 Knappheitslevel: Ein Wert zwischen 1 und 10, der basierend auf dem aktuellen Lagerbestand berechnet wird.
 Kumulative Engpässe: Verfolgt die Anzahl der Monate, in denen ein Engpass aufgetreten ist.
 Produktionsboost: Bei hohen Knappheitsleveln wird ein Produktionsboost geplant, um den Lagerbestand wieder aufzufüllen.
 Vorhersage durch ML-Modell: Das Modell nutzt maschinelles Lernen, um zukünftige Knappheiten vorherzusagen und dem Schweizer Staat frühzeitige Interventionen zu ermöglichen.
-Wichtige Parameter und Variablen
+
+
+# Wichtige Parameter und Variablen
 population: Die Gesamtbevölkerung der Schweiz, die als Basis für die Nachfrage dient.
 variance: Die Varianz, die zur Nachfrage hinzugefügt wird, um natürliche Schwankungen zu simulieren.
 production_variance: Die Varianz, die zur Produktion hinzugefügt wird.
