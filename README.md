@@ -43,33 +43,33 @@ Vorhersage durch ML-Modell: Das Modell nutzt maschinelles Lernen, um zukünftige
 
 
 # Wichtige Parameter und Variablen
-population: Die Gesamtbevölkerung der Schweiz, die als Basis für die Nachfrage dient.
-variance: Die Varianz, die zur Nachfrage hinzugefügt wird, um natürliche Schwankungen zu simulieren.
-production_variance: Die Varianz, die zur Produktion hinzugefügt wird.
-max_production_capacity: Die maximale Produktionskapazität pro Monat.
-production_cycle: Der Wirkstoffverbrauch pro Produktionseinheit.
-restock_interval: Das Intervall in Monaten, in dem das Medikament produziert wird.
-wirkstoff_restock_interval: Das Intervall in Monaten, in dem der Wirkstoff gekauft wird.
-base_restock_amount: Die Basismenge, die bei jedem Restock produziert wird.
-wirkstoff_restock_amount: Die Menge an Wirkstoff, die bei jedem Restock gekauft wird.
-seasonality: Ein Dictionary, das saisonale Faktoren für jeden Monat enthält.
+### population: Die Gesamtbevölkerung der Schweiz, die als Basis für die Nachfrage dient.
+### variance: Die Varianz, die zur Nachfrage hinzugefügt wird, um natürliche Schwankungen zu simulieren.
+### production_variance: Die Varianz, die zur Produktion hinzugefügt wird.
+### max_production_capacity: Die maximale Produktionskapazität pro Monat.
+### production_cycle: Der Wirkstoffverbrauch pro Produktionseinheit.
+### restock_interval: Das Intervall in Monaten, in dem das Medikament produziert wird.
+### wirkstoff_restock_interval: Das Intervall in Monaten, in dem der Wirkstoff gekauft wird.
+### base_restock_amount: Die Basismenge, die bei jedem Restock produziert wird.
+### wirkstoff_restock_amount: Die Menge an Wirkstoff, die bei jedem Restock gekauft wird.
+### seasonality: Ein Dictionary, das saisonale Faktoren für jeden Monat enthält.
 Ablauf der Simulation
-Initialisierung: Setzt die Anfangswerte für Lagerbestand, Wirkstoffbestand und andere Variablen.
-Monatliche Iteration: Für jeden Monat im Simulationszeitraum werden folgende Schritte durchgeführt:
-Nachfrageberechnung: Berechnet die monatliche Nachfrage unter Berücksichtigung von Saisonalität und Varianz.
-Produktion:
+### Initialisierung: Setzt die Anfangswerte für Lagerbestand, Wirkstoffbestand und andere Variablen.
+### Monatliche Iteration: Für jeden Monat im Simulationszeitraum werden folgende Schritte durchgeführt:
+### Nachfrageberechnung: Berechnet die monatliche Nachfrage unter Berücksichtigung von Saisonalität und Varianz.
+### Produktion:
 Überprüft, ob ein Restock ansteht.
 Berechnet die mögliche Produktionsmenge basierend auf Kapazität, Varianz und Wirkstoffverfügbarkeit.
 Aktualisiert den Lagerbestand und den Wirkstoffbestand.
-Verkauf:
+### Verkauf:
 Berechnet die Verkaufsmenge unter Berücksichtigung von Nachfrage und Guardrails.
 Aktualisiert den Lagerbestand.
-Engpassbewertung:
+### Engpassbewertung:
 Berechnet das Knappheitslevel.
 Verfolgt kumulative Engpässe.
 Plant gegebenenfalls einen Produktionsboost.
-Vorhersage durch ML-Modell: Nutzt historische Daten, um zukünftige Knappheiten vorherzusagen.
-Datenaufzeichnung: Speichert alle relevanten Variablen für die Analyse.
+### Vorhersage durch ML-Modell: Nutzt historische Daten, um zukünftige Knappheiten vorherzusagen.
+### Datenaufzeichnung: Speichert alle relevanten Variablen für die Analyse.
 Verwendung der Simulation
 Die Simulation kann mit den Standardparametern ausgeführt werden oder durch Anpassen der Parameter an spezifische Szenarien angepasst werden.
 
