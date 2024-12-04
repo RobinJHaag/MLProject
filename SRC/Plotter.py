@@ -26,11 +26,15 @@ class Plotter:
         ]
 
     def plot_dataframe_as_image(self):
-
         self.truncate_large_cells(max_width=15)
         self.wrap_column_names(max_width=15)
 
-        fig, ax = plt.subplots(figsize=(20, 10))
+        # Calculate figure size based on DataFrame dimensions
+        num_rows, num_cols = self.df.shape
+        fig_width = max(20, num_cols * 1.5)
+        fig_height = max(10, num_rows * 0.5)
+
+        fig, ax = plt.subplots(figsize=(fig_width, fig_height))
         ax.axis("tight")
         ax.axis("off")
 
@@ -43,3 +47,4 @@ class Plotter:
 
         plt.subplots_adjust(left=0.05, right=0.95, top=0.85, bottom=0.15)
         plt.show()
+
