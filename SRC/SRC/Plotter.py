@@ -1,24 +1,18 @@
 import matplotlib.pyplot as plt
 from pandas.plotting import table
 
+
 class Plotter:
     def __init__(self, df):
         self.df = df
 
     def truncate_large_cells(self, max_width=15):
-        """
-        Truncate cell values in the DataFrame that exceed a specified width
-        and append '...' to indicate truncation.
-        """
         for col in self.df.columns:
             self.df[col] = self.df[col].apply(
                 lambda x: f"{str(x)[:max_width]}..." if len(str(x)) > max_width else x
             )
 
     def wrap_column_names(self, max_width=15):
-        """
-        Wrap column names into multiple lines if they exceed a specified width.
-        """
         self.df.columns = [
             "\n".join(col[i:i + max_width] for i in range(0, len(col), max_width))
             if len(col) > max_width else col
@@ -29,7 +23,6 @@ class Plotter:
         self.truncate_large_cells(max_width=15)
         self.wrap_column_names(max_width=15)
 
-        # Calculate figure size based on DataFrame dimensions
         num_rows, num_cols = self.df.shape
         fig_width = max(20, num_cols * 1.5)
         fig_height = max(10, num_rows * 0.5)
@@ -47,4 +40,3 @@ class Plotter:
 
         plt.subplots_adjust(left=0.05, right=0.95, top=0.85, bottom=0.15)
         plt.show()
-

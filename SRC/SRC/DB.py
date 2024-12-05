@@ -18,23 +18,21 @@ def save_simulation_to_db(session, dates_df, simulation_df):
     """
     Save the simulation data into the database.
     """
-    # Save dates to the database
+
     date_id_map = {}
     for _, row in dates_df.iterrows():
-        # Check if the date already exists
         existing_date = session.query(Dates).filter_by(date=row['date']).first()
         if existing_date:
             date_id_map[row['date']] = existing_date.date_id
         else:
-            # Add new date and get its ID
             new_date = Dates(date=row['date'], month_name=row['month_name'])
             session.add(new_date)
-            session.flush()  # Get the generated primary key
+            session.flush()
             date_id_map[row['date']] = new_date.date_id
 
-    session.commit()  # Commit all new dates to generate IDs
+    session.commit()
 
-    # Save simulation data
+
     for i, sim_row in enumerate(simulation_df.itertuples(index=False, name=None)):  # Enumerate for index tracking
         (
             sales,
@@ -50,14 +48,14 @@ def save_simulation_to_db(session, dates_df, simulation_df):
             shortage_level
         ) = sim_row
 
-        # Use the current loop index `i` to access the date in dates_df
+
         date = dates_df.loc[i, 'date']
         date_id = date_id_map.get(date)
 
         if date_id is None:
             raise ValueError(f"Date ID not found for {date} in simulation_df row {i}.")
 
-        # Create a SimulationData object
+
         simulation_data = SimulationData(
             date_id=date_id,
             sales=sales,
