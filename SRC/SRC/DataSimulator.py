@@ -108,8 +108,9 @@ class DataSimulator:
             sales_to_stock_ratios.append(sales_to_stock_ratio)
             wirkstoff_stock_percentages.append(wirkstoff_stock_percentage)
 
-        dates_df = pd.DataFrame({'date': dates.strftime('%Y-%m-%d'), 'month_name': dates.strftime('%B')})
         simulation_df = pd.DataFrame({
+            'date': dates.strftime('%Y-%m-%d'),  # Include dates directly in simulation_df
+            'month_name': dates.strftime('%B'),  # Include month names directly in simulation_df
             'sales': total_sales,
             'stock': total_stock,
             'wirkstoff_stock': wirkstoff_stock_over_time,
@@ -121,11 +122,8 @@ class DataSimulator:
             'sales_to_stock_ratio': sales_to_stock_ratios,
             'wirkstoff_stock_percentage': wirkstoff_stock_percentages,
             'shortage_level': shortage_levels
-
         })
 
-        simulation_df.columns = simulation_df.columns.str.replace(r"\n", "", regex=True)
-        print("Cleaned simulation_df columns:", list(simulation_df.columns))
         simulation_df = simulation_df.round(2)
 
-        return dates_df, simulation_df
+        return simulation_df

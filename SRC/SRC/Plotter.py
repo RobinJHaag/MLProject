@@ -1,25 +1,43 @@
 import matplotlib.pyplot as plt
 from pandas.plotting import table
+import os
 
 
 class Plotter:
-    def __init__(self, df):
+    def __init__(self, df, save_path="SRC/SRC/DataFrames"):
         self.df = df
+        self.save_path = save_path
+        self.ensure_save_directory()
+
+    def ensure_save_directory(self):
+        """
+        Ensure that the save directory exists; if not, create it.
+        """
+        os.makedirs(self.save_path, exist_ok=True)
 
     def truncate_large_cells(self, max_width=15):
+        """
+        Truncate the content of large cells in the DataFrame to improve display readability.
+        """
         for col in self.df.columns:
             self.df[col] = self.df[col].apply(
                 lambda x: f"{str(x)[:max_width]}..." if len(str(x)) > max_width else x
             )
 
     def wrap_column_names(self, max_width=15):
+        """
+        Wrap column names to fit within the specified maximum width.
+        """
         self.df.columns = [
             "\n".join(col[i:i + max_width] for i in range(0, len(col), max_width))
             if len(col) > max_width else col
             for col in self.df.columns
         ]
 
-    def plot_dataframe_as_image(self):
+    def plot_dataframe_as_image(self, file_name="dataframe_plot.png"):
+        """
+        Plot the DataFrame as an image and save it to a PNG file.
+        """
         self.truncate_large_cells(max_width=15)
         self.wrap_column_names(max_width=15)
 
@@ -38,5 +56,26 @@ class Plotter:
         tbl.set_fontsize(8)
         tbl.scale(1, 1.2)
 
-        plt.subplots_adjust(left=0.05, right=0.95, top=0.85, bottom=0.15)
+        # Save the plot as a PNG file
+        file_path = os.path.join(self.save_path, file_name)
+        plt.savefig(file_path, bbox_inches="tight")
         plt.show()
+        plt.close(fig)
+
+        print(f"DataFrame plot saved as {file_path}.")
+
+
+    def save_dataframe(self, file_name="dataframe.csv", file_type="csv"):
+        """
+        Save the DataFrame to a file in the specified directory.
+        Supports saving as CSV or Pickle.
+        """
+        file_path = os.path.join(self.save_path, file_name)
+        if file_type == "csv":
+            self.df.to_csv(file_path, index=False)
+        elif file_type == "pickle":
+            self.df.to_pickle(file_path)
+        else:
+            raise ValueError("Unsupported file type. Use 'csv' or 'pickle'.")
+
+        print(f"DataFrame saved to {file_path}.")

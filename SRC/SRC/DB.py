@@ -1,79 +1,93 @@
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import create_engine
-from DB_Setup import Base, Dates, SimulationData
+from sqlalchemy import func
+from DB_Setup import Dates, SimulationData
 
+class DatabaseManager:
+    def __init__(self, engine):
+        self.engine = engine
+        self.session = self.get_session()
 
-def init_db(db_name='simulation_3nf.db'):
-    engine = create_engine(f'sqlite:///{db_name}', echo=False)
-    Base.metadata.create_all(engine)
-    return engine
+    def get_session(self):
+        """
+        Create a new session for the database.
+        """
+        Session = sessionmaker(bind=self.engine)
+        return Session()
 
+    def is_simulation_data_complete(self, months=120):
+        """
+        Check if the database already has the specified number of months of simulated data.
+        """
+        total_months = self.session.query(func.count(Dates.date_id)).scalar()
+        return total_months == months
 
-def get_session(engine):
-    Session = sessionmaker(bind=engine)
-    return Session()
+    def load_simulation_data(self):
+        """
+        Load simulation data from the database into a DataFrame.
+        """
+        query = self.session.query(
+            SimulationData,
+            Dates.date,
+            Dates.month_name
+        ).join(Dates, SimulationData.date_id == Dates.date_id)
 
+        # Convert query results to a DataFrame
+        df = pd.DataFrame([{
+            'date': row.date,
+            'month_name': row.month_name,
+            'sales': row.sales,
+            'stock': row.stock,
+            'wirkstoff_stock': row.wirkstoff_stock,
+            'demand_spike_indicator': row.demand_spike_indicator,
+            'stock_to_sales_ratio': row.stock_to_sales_ratio,
+            'time_since_last_shortage_event': row.time_since_last_shortage_event,
+            'months_since_prod_issue': row.months_since_prod_issue,
+            'cumulative_shortages': row.cumulative_shortages,
+            'sales_to_stock_ratio': row.sales_to_stock_ratio,
+            'wirkstoff_stock_percentage': row.wirkstoff_stock_percentage,
+            'shortage_level': row.shortage_level
+        } for row in query.all()])
 
-def save_simulation_to_db(session, dates_df, simulation_df):
-    """
-    Save the simulation data into the database.
-    """
+        return df
 
-    date_id_map = {}
-    for _, row in dates_df.iterrows():
-        existing_date = session.query(Dates).filter_by(date=row['date']).first()
-        if existing_date:
-            date_id_map[row['date']] = existing_date.date_id
-        else:
-            new_date = Dates(date=row['date'], month_name=row['month_name'])
-            session.add(new_date)
-            session.flush()
-            date_id_map[row['date']] = new_date.date_id
+    def save_simulation_to_db(self, simulation_df):
+        """
+        Save simulation data into the database, mapping 'date' to 'date_id'.
+        """
+        # Map existing dates to date_ids
+        date_id_map = {}
+        for date in simulation_df['date'].unique():
+            existing_date = self.session.query(Dates).filter_by(date=date).first()
+            if existing_date:
+                date_id_map[date] = existing_date.date_id
+            else:
+                # Add date to the Dates table if it doesn't exist
+                new_date = Dates(date=date, month_name=simulation_df[simulation_df['date'] == date]['month_name'].iloc[0])
+                self.session.add(new_date)
+                self.session.flush()  # Retrieve date_id
+                date_id_map[date] = new_date.date_id
 
-    session.commit()
+        self.session.commit()  # Commit dates to the database
 
+        # Insert simulation data
+        for i, row in simulation_df.iterrows():
+            try:
+                simulation_data = SimulationData(
+                    date_id=date_id_map[row['date']],  # Map 'date' to 'date_id'
+                    sales=row['sales'],
+                    stock=row['stock'],
+                    wirkstoff_stock=row['wirkstoff_stock'],
+                    demand_spike_indicator=row['demand_spike_indicator'],
+                    stock_to_sales_ratio=row['stock_to_sales_ratio'],
+                    time_since_last_shortage_event=row['time_since_last_shortage_event'],
+                    months_since_prod_issue=row['months_since_prod_issue'],
+                    cumulative_shortages=row['cumulative_shortages'],
+                    sales_to_stock_ratio=row['sales_to_stock_ratio'],
+                    wirkstoff_stock_percentage=row['wirkstoff_stock_percentage'],
+                    shortage_level=row['shortage_level']
+                )
+                self.session.add(simulation_data)
+            except Exception as e:
+                print(f"Error saving row {i}: {e}")
 
-    for i, sim_row in enumerate(simulation_df.itertuples(index=False, name=None)):  # Enumerate for index tracking
-        (
-            sales,
-            stock,
-            wirkstoff_stock,
-            demand_spike_indicator,
-            stock_to_sales_ratio,
-            time_since_last_shortage_event,
-            months_since_prod_issue,
-            cumulative_shortages,
-            sales_to_stock_ratio,
-            wirkstoff_stock_percentage,
-            shortage_level
-        ) = sim_row
-
-
-        date = dates_df.loc[i, 'date']
-        date_id = date_id_map.get(date)
-
-        if date_id is None:
-            raise ValueError(f"Date ID not found for {date} in simulation_df row {i}.")
-
-
-        simulation_data = SimulationData(
-            date_id=date_id,
-            sales=sales,
-            stock=stock,
-            wirkstoff_stock=wirkstoff_stock,
-            demand_spike_indicator=demand_spike_indicator,
-            stock_to_sales_ratio=stock_to_sales_ratio,
-            time_since_last_shortage_event=time_since_last_shortage_event,
-            months_since_prod_issue=months_since_prod_issue,
-            cumulative_shortages=cumulative_shortages,
-            sales_to_stock_ratio=sales_to_stock_ratio,
-            wirkstoff_stock_percentage=wirkstoff_stock_percentage,
-            shortage_level=shortage_level
-        )
-        session.add(simulation_data)
-
-
-
-
-
-
+        self.session.commit()  # Commit all simulation data
