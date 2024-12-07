@@ -1,46 +1,45 @@
+import pandas
+
 from DB_Setup import init_db
 from DB import DatabaseManager
 from DataSimulator import DataSimulator
 from Plotter import Plotter
 import os
+import pandas as pd
 
 
 def main():
-    # Step 1: Initialize the database and database manager
-    engine = init_db()
-    db_manager = DatabaseManager(engine)
+    # Define paths to the output files
+    csv_path = "Dataframes_CSV_PNG/simulation_results.csv"
+    png_path = "Dataframes_CSV_PNG/simulation_results.png"
 
-    # Step 2: Check if simulation data exists in the database
-    if db_manager.is_simulation_data_complete():
-        print("Simulation data already exists. Loading from database...")
-
-
-        # Update the path to the previously saved DataFrame
-        saved_csv_path = os.path.join(os.getcwd(), "Dataframes_CSV_PNG", "simulation_results.csv")
-        print(f"Previously saved DataFrame located at: {saved_csv_path}")
+    # Check if files already exist
+    if os.path.exists(csv_path) and os.path.exists(png_path):
+        print("Simulation already completed. Loading data from CSV...")
+        simulation_df = pd.read_csv(csv_path)  # Load the CSV if you need the data
     else:
-        print("Simulation data not found or incomplete. Running simulation...")
+        print("Simulation files not found. Running simulation...")
+
+        # Initialize the database and run the simulation
+        engine = init_db()
+        db_manager = DatabaseManager(engine)
         simulator = DataSimulator(random_state=42, months_to_simulate=120)
         simulation_df = simulator.simulate_sales_and_stock()
+
+        # Save results to the database
         db_manager.save_simulation_to_db(simulation_df)
 
-        # Save the DataFrame as a CSV and PNG
+        # Save results to CSV and PNG
+        simulation_df.to_csv(csv_path, index=False)
         plotter = Plotter(simulation_df)
+        plotter.plot_dataframe_as_image(file_name=png_path, show=True)
+        print("Simulation results saved as CSV and PNG.")
 
-        # Define the directory path
-        directory_path = os.path.join(os.getcwd(), "Dataframes_CSV_PNG")
-
-        # Create the directory if it does not exist
-        os.makedirs(directory_path, exist_ok=True)
-
-        # Save as CSV
-        plotter.save_dataframe(file_name=os.path.join(directory_path, "simulation_results.csv"))
-
-        # Save as PNG
-        plotter.plot_dataframe_as_image(file_name=os.path.join(directory_path, "simulation_results.png"))
-
-        print("Simulation data has been saved as both CSV and PNG.")
+    # Example usage of simulation_df to avoid the warning
+    print(simulation_df.head())
 
 
 if __name__ == "__main__":
     main()
+
+
