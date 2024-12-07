@@ -11,14 +11,14 @@ class DataSimulator:
         self.population = 1_000_000
         self.variance = 650_000
         self.production_variance = 300_000
-        self.wirkstoff_stock = 3_000_000
+        self.wirkstoff_stock = 2_000_000
         self.max_wirkstoff_stock = 6_000_000
         self.production_cycle = 1.25
         self.wirkstoff_ramp_up_delay = 3
         self.max_production_capacity = 380_000
         self.restock_delay = 0
         self.wirkstoff_restock_interval = 3
-        self.wirkstoff_restock_amount = 1_125_000
+        self.wirkstoff_restock_amount = 1_400_000
         self.wirkstoff_restock_variance = 500_000
 
     def simulate_sales_and_stock(self):
@@ -26,8 +26,8 @@ class DataSimulator:
 
         seasonality = {
             'January': 1.2, 'February': 1.1, 'March': 1.0, 'April': 0.9, 'May': 0.8,
-            'June': 0.8, 'July': 0.85, 'August': 0.9, 'September': 1.0,
-            'October': 1.1, 'November': 1.2, 'December': 1.3
+            'June': 0.6, 'July': 0.7, 'August': 0.7, 'September': 0.8,
+            'October': 1.0, 'November': 1.2, 'December': 1.3
         }
 
         dates = pd.date_range(start='2024-01-01', periods=self.simulation_time_span, freq='MS')

@@ -4,9 +4,9 @@ import os
 
 
 class Plotter:
-    def __init__(self, df, save_path="project_root/Dataframes_CSV_PNG"):
+    def __init__(self, df, save_path="/Dataframes_CSV_PNG"):
         self.df = df
-        self.save_path = save_path
+        self.save_path = os.path.abspath(save_path)  # Use absolute path
         self.ensure_save_directory()
 
     def ensure_save_directory(self):
@@ -57,25 +57,22 @@ class Plotter:
         tbl.scale(1, 1.2)
 
         # Save the plot as a PNG file
-        file_path = os.path.join(self.save_path, file_name)
+        file_path = os.path.join(self.save_path, file_name)  # Relative to save_path
+        print(f"Saving PNG to: {file_path}")  # Debug print
+
         plt.savefig(file_path, bbox_inches="tight")
         plt.show()
         plt.close(fig)
 
         print(f"DataFrame plot saved as {file_path}.")
 
-
-    def save_dataframe(self, file_name="dataframe.csv", file_type="csv"):
+    def save_dataframe(self, file_name="dataframe.csv"):
         """
         Save the DataFrame to a file in the specified directory.
-        Supports saving as CSV or Pickle.
+        Supports saving as CSV.
         """
         file_path = os.path.join(self.save_path, file_name)
-        if file_type == "csv":
-            self.df.to_csv(file_path, index=False)
-        elif file_type == "pickle":
-            self.df.to_pickle(file_path)
-        else:
-            raise ValueError("Unsupported file type. Use 'csv' or 'pickle'.")
+        print(f"Saving CSV to: {file_path}")  # Debug print
 
-        print(f"DataFrame saved to {file_path}.")
+        self.df.to_csv(file_path, index=False)
+
