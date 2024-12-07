@@ -3,7 +3,7 @@ from DB import DatabaseManager
 from DataSimulator import DataSimulator
 from Plotter import Plotter
 import os
-import pandas as pd
+
 
 def main():
     # Step 1: Initialize the database and database manager
@@ -13,10 +13,10 @@ def main():
     # Step 2: Check if simulation data exists in the database
     if db_manager.is_simulation_data_complete():
         print("Simulation data already exists. Loading from database...")
-        simulation_df = db_manager.load_simulation_data()
 
-        # Print the path to the previously saved DataFrame
-        saved_csv_path = os.path.join("SRC", "SRC", "DataFrames", "simulation_results.csv")
+
+        # Update the path to the previously saved DataFrame
+        saved_csv_path = os.path.join(os.getcwd(), "Dataframes_CSV_PNG", "simulation_results.csv")
         print(f"Previously saved DataFrame located at: {saved_csv_path}")
     else:
         print("Simulation data not found or incomplete. Running simulation...")
@@ -27,11 +27,17 @@ def main():
         # Save the DataFrame as a CSV and PNG
         plotter = Plotter(simulation_df)
 
+        # Define the directory path
+        directory_path = os.path.join(os.getcwd(), "Dataframes_CSV_PNG")
+
+        # Create the directory if it does not exist
+        os.makedirs(directory_path, exist_ok=True)
+
         # Save as CSV
-        plotter.save_dataframe(file_name="simulation_results.csv")
+        plotter.save_dataframe(file_name=os.path.join(directory_path, "simulation_results.csv"))
 
         # Save as PNG
-        plotter.plot_dataframe_as_image(file_name="simulation_results.png")
+        plotter.plot_dataframe_as_image(file_name=os.path.join(directory_path, "simulation_results.png"))
 
         print("Simulation data has been saved as both CSV and PNG.")
 

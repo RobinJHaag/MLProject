@@ -4,7 +4,7 @@ import os
 
 
 class Plotter:
-    def __init__(self, df, save_path="SRC/SRC/DataFrames"):
+    def __init__(self, df, save_path="project_root/Dataframes_CSV_PNG"):
         self.df = df
         self.save_path = save_path
         self.ensure_save_directory()

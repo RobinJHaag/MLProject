@@ -2,6 +2,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import func
 from DB_Setup import Dates, SimulationData
 
+
 class DatabaseManager:
     def __init__(self, engine):
         self.engine = engine
@@ -62,7 +63,8 @@ class DatabaseManager:
                 date_id_map[date] = existing_date.date_id
             else:
                 # Add date to the Dates table if it doesn't exist
-                new_date = Dates(date=date, month_name=simulation_df[simulation_df['date'] == date]['month_name'].iloc[0])
+                new_date = Dates(date=date,
+                                 month_name=simulation_df[simulation_df['date'] == date]['month_name'].iloc[0])
                 self.session.add(new_date)
                 self.session.flush()  # Retrieve date_id
                 date_id_map[date] = new_date.date_id
