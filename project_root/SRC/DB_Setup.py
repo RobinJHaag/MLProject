@@ -3,7 +3,8 @@ from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
 
-# Define your tables
+
+# Database schema
 class Dates(Base):
     __tablename__ = 'dates'
     date_id = Column(Integer, primary_key=True)
@@ -40,3 +41,10 @@ class SimulationData(Base):
     sales_to_stock_ratio = Column(Float)
     wirkstoff_stock_percentage = Column(Float)
     shortage_level = Column(Integer)
+
+
+# Initialize database
+def init_db(db_name='simulation_3nf.db'):
+    engine = create_engine(f'sqlite:///{db_name}', echo=False)
+    Base.metadata.create_all(engine)
+    return engine
