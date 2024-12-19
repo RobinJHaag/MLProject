@@ -69,24 +69,25 @@ Die monatliche Nachfrage wird berechnet durch:
 Die Simulation kann mit den Standardparametern ausgeführt werden oder durch Anpassen der Parameter an spezifische Szenarien angepasst werden.
 
 ## Ergebnisse anzeigen
+```markdown
 ```python
 print(simulation_df)
+```
 
 ## Interpretation der Ergebnisse
 
-- **sales:** Verkaufsmenge in Millionen Einheiten pro Monat.
-- **stock:** Aktueller Lagerbestand in Millionen Einheiten.
-- **wirkstoff_stock:** Aktueller Wirkstoffbestand in Millionen Einheiten.
-- **demand_spike_indicator:** Gibt an, ob eine Nachfragespitze aufgetreten ist (1) oder nicht (0).
-- **stock_to_demand_ratio:** Verhältnis von Lagerbestand zur Nachfrage.
-- **time_since_last_shortage_event:** Anzahl der Monate seit dem letzten Engpass.
-- **months_since_prod_issue:** Anzahl der Monate seit dem letzten Produktionsproblem.
-- **production_to_demand_ratio:** Verhältnis von Produktion zur Nachfrage.
-- **cumulative_shortages:** Kumulative Anzahl der Engpässe.
-- **shortage_level:** Aktuelles Knappheitslevel (1-10), wobei 1 ausreichend Lagerbestand und 10 akuten Mangel anzeigt.
+- **sales**: Verkaufsmenge in Millionen Einheiten pro Monat.
+- **stock**: Aktueller Lagerbestand in Millionen Einheiten.
+- **wirkstoff_stock**: Aktueller Wirkstoffbestand in Millionen Einheiten.
+- **demand_spike_indicator**: Gibt an, ob eine Nachfragespitze aufgetreten ist (1) oder nicht (0).
+- **stock_to_demand_ratio**: Verhältnis von Lagerbestand zur Nachfrage.
+- **time_since_last_shortage_event**: Anzahl der Monate seit dem letzten Engpass.
+- **months_since_prod_issue**: Anzahl der Monate seit dem letzten Produktionsproblem.
+- **production_to_demand_ratio**: Verhältnis von Produktion zur Nachfrage.
+- **cumulative_shortages**: Kumulative Anzahl der Engpässe.
+- **shortage_level**: Aktuelles Knappheitslevel (1-10), wobei 1 ausreichend Lagerbestand und 10 akuten Mangel anzeigt.
 
 ## Bedeutung für den Schweizer Staat
 
 Diese Simulation ermöglicht es dem Schweizer Staat, einen detaillierten Einblick in die Versorgungssituation eines wichtigen Medikaments zu erhalten. Durch die Integration eines maschinellen Lernmodells können zukünftige Engpässe frühzeitig vorhergesagt werden, was eine proaktive Planung und Intervention ermöglicht. Dies trägt dazu bei, die Versorgungssicherheit der Bevölkerung zu gewährleisten und die Auswirkungen von Medikamentenknappheiten zu minimieren.
-
-
+```
