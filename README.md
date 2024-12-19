@@ -1,3 +1,4 @@
+
 # Pharmazeutische Produktions- und Vertriebssimulation
 
 Diese Simulation modelliert aus der Perspektive des Schweizer Staates die Produktion, den Verkauf und das Bestandsmanagement eines wichtigen Medikaments auf nationaler Ebene über einen Zeitraum von 48 Monaten. Sie dient als Prototyp, um Engpässe frühzeitig zu erkennen und effektiver darauf reagieren zu können.
@@ -68,11 +69,6 @@ Die monatliche Nachfrage wird berechnet durch:
 
 Die Simulation kann mit den Standardparametern ausgeführt werden oder durch Anpassen der Parameter an spezifische Szenarien angepasst werden.
 
-## Ergebnisse anzeigen
-```markdown
-```python
-print(simulation_df)
-```
 
 ## Interpretation der Ergebnisse
 
@@ -90,3 +86,30 @@ print(simulation_df)
 ## Bedeutung für den Schweizer Staat
 
 Diese Simulation ermöglicht es dem Schweizer Staat, einen detaillierten Einblick in die Versorgungssituation eines wichtigen Medikaments zu erhalten. Durch die Integration eines maschinellen Lernmodells können zukünftige Engpässe frühzeitig vorhergesagt werden, was eine proaktive Planung und Intervention ermöglicht. Dies trägt dazu bei, die Versorgungssicherheit der Bevölkerung zu gewährleisten und die Auswirkungen von Medikamentenknappheiten zu minimieren.
+
+## Machine Learning Modelle
+
+In der Simulation werden verschiedene maschinelle Lernmodelle verwendet, um zukünftige Knappheiten vorherzusagen. Die Hauptmodelle sind:
+
+- **Lineare Regression**: Ein einfaches Modell, das gut für lineare Beziehungen zwischen Variablen geeignet ist.
+- **XGBoost**: Ein leistungsfähiges Modell für strukturierte Daten, das auf einem Gradient Boosting-Algorithmus basiert und besonders bei komplexeren Datenstrukturen eine gute Leistung zeigt.
+- **Support Vector Machine (SVM)**: Ein Modell, das besonders bei kleinen Datensätzen gut funktioniert und oft eine hohe Genauigkeit bei Klassifikationsaufgaben erzielt.
+
+### Hyperparameter-Tuning
+
+Für jedes der Modelle wurde **GridSearchCV** verwendet, um die besten Hyperparameter zu finden:
+
+- **Linear Regression**: Es wurden verschiedene Parameter getestet, aber letztendlich wurde der Parameter `fit_intercept` optimiert.
+- **XGBoost**: Wichtige Parameter wie `learning_rate`, `max_depth`, und `n_estimators` wurden durch GridSearchCV optimiert.
+- **SVM**: Hier wurden die Parameter `C`, `epsilon`, und `gamma` abgestimmt, um die beste Leistung zu erzielen.
+
+Die Modelle wurden auf den Trainingsdaten trainiert und auf den Testdaten evaluiert, wobei die MSE (Mean Squared Error) als Metrik verwendet wurde.
+
+## Prophet zur Modellierung saisonaler Effekte
+
+**Prophet** wurde verwendet, um saisonale Schwankungen in der Nachfrage zu modellieren. Es handelt sich um ein Modell von Facebook, das speziell für Zeitreihendaten entwickelt wurde und saisonale, wöchentliche und jährliche Effekte berücksichtigt. In der Simulation wurden die Vorhersagen des Prophet-Modells verwendet, um saisonale Schwankungen in der Nachfrage zu simulieren, was zu einer realistischeren Modellierung der Medikamentennachfrage führt.
+
+Durch diese Integration konnte die Genauigkeit der Vorhersagen verbessert und unvorhergesehene Nachfragespitzen berücksichtigt werden.
+```
+
+This README now includes information on your ML models, hyperparameter tuning, and how Prophet was used for seasonal adjustments in the data.
