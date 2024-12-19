@@ -110,6 +110,6 @@ Die Modelle wurden auf den Trainingsdaten trainiert und auf den Testdaten evalui
 **Prophet** wurde verwendet, um saisonale Schwankungen in der Nachfrage zu modellieren. Es handelt sich um ein Modell von Facebook, das speziell für Zeitreihendaten entwickelt wurde und saisonale, wöchentliche und jährliche Effekte berücksichtigt. In der Simulation wurden die Vorhersagen des Prophet-Modells verwendet, um saisonale Schwankungen in der Nachfrage zu simulieren, was zu einer realistischeren Modellierung der Medikamentennachfrage führt.
 
 Durch diese Integration konnte die Genauigkeit der Vorhersagen verbessert und unvorhergesehene Nachfragespitzen berücksichtigt werden.
-```
 
-This README now includes information on your ML models, hyperparameter tuning, and how Prophet was used for seasonal adjustments in the data.
+
+
