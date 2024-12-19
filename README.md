@@ -90,4 +90,3 @@ print(simulation_df)
 ## Bedeutung für den Schweizer Staat
 
 Diese Simulation ermöglicht es dem Schweizer Staat, einen detaillierten Einblick in die Versorgungssituation eines wichtigen Medikaments zu erhalten. Durch die Integration eines maschinellen Lernmodells können zukünftige Engpässe frühzeitig vorhergesagt werden, was eine proaktive Planung und Intervention ermöglicht. Dies trägt dazu bei, die Versorgungssicherheit der Bevölkerung zu gewährleisten und die Auswirkungen von Medikamentenknappheiten zu minimieren.
-```
