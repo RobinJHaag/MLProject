@@ -4,30 +4,8 @@ from sqlalchemy.orm import declarative_base
 Base = declarative_base()
 
 
-# Database schema
-class Dates(Base):
-    __tablename__ = 'dates'
-    date_id = Column(Integer, primary_key=True)
-    date = Column(String, unique=True)
-    month_name = Column(String)
-
-
-class Shortages(Base):
-    __tablename__ = 'shortages'
-    shortage_id = Column(Integer, primary_key=True)
-    shortage_status = Column(Integer)
-    description = Column(String)
-
-
-class Restocks(Base):
-    __tablename__ = 'restocks'
-    restock_id = Column(Integer, primary_key=True)
-    last_restock_amount = Column(Float)
-    days_since_last_restock = Column(Integer)
-
-
-class SimulationData(Base):
-    __tablename__ = 'simulation_data'
+# Shared schema for training and testing tables
+class BaseSimulationData:
     simulation_id = Column(Integer, primary_key=True)
     date_id = Column(Integer, ForeignKey('dates.date_id'))
     sales = Column(Float)
@@ -42,9 +20,32 @@ class SimulationData(Base):
     wirkstoff_stock_percentage = Column(Float)
     shortage_level = Column(Integer)
 
+    # New fields
+    last_restock_amount = Column(Float)
+    days_since_last_restock = Column(Integer)
+    trend = Column(Float)
+    seasonal = Column(Float)
+    residual = Column(Float)
+
+
+class TrainingSimulationData(Base, BaseSimulationData):
+    __tablename__ = 'training_simulation_data'
+
+
+class TestingSimulationData(Base, BaseSimulationData):
+    __tablename__ = 'testing_simulation_data'
+
+
+class Dates(Base):
+    __tablename__ = 'dates'
+    date_id = Column(Integer, primary_key=True)
+    date = Column(String, unique=True)
+    month_name = Column(String)
+
 
 # Initialize database
 def init_db(db_name='simulation_3nf.db'):
     engine = create_engine(f'sqlite:///{db_name}', echo=False)
     Base.metadata.create_all(engine)
     return engine
+
