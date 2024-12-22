@@ -65,7 +65,7 @@ class DataSimulator:
             )
             monthly_demand = max(0, monthly_demand)
 
-            if seasonality[month_name] > 1.0 and np.random.random() < 0.05:
+            if seasonality[month_name] > 1.0 and np.random.random() < 0.06:
                 monthly_demand *= 1.5 + np.random.random() * 0.5
                 demand_spike_indicator.append(1)
             else:
