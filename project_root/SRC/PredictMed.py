@@ -1,18 +1,36 @@
 import pandas as pd
-from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.model_selection import GridSearchCV
 from sklearn.linear_model import LinearRegression
-from sklearn.ensemble import RandomForestRegressor
 from sklearn.svm import SVR
 from xgboost import XGBRegressor
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_squared_error
-from DB_Setup import TrainingSimulationData, TestingSimulationData  # Assuming the correct imports for the tables
+from DB_Setup import TrainingSimulationData, TestingSimulationData
 from DB import DatabaseManager
 
 
-def train_and_evaluate_models(db_manager):
+def evaluate_model(testing_df, features, scaler, model, months):
     """
-    Train on the training dataset and evaluate on the testing dataset.
+    Evaluate the model for a specific number of months.
+    """
+    # Filter data for the specified time horizon
+    X_test = testing_df[features].iloc[:months]
+    y_test = testing_df['shortage_level'].iloc[:months]
+
+    # Normalize the test data (matching the training scaling)
+    X_test_scaled = scaler.transform(X_test)
+
+    # Predict shortage levels
+    y_pred = model.predict(X_test_scaled)
+
+    # Calculate Mean Squared Error (MSE)
+    mse = mean_squared_error(y_test, y_pred)
+    return mse
+
+
+def train_and_evaluate_models_monthly(db_manager):
+    """
+    Train on the training dataset and evaluate the testing dataset over 12, 24, and 36 months.
     """
     # Load data directly from the database
     training_df = db_manager.load_simulation_data(TrainingSimulationData)
@@ -21,20 +39,16 @@ def train_and_evaluate_models(db_manager):
     # Feature set
     features = [
         'sales', 'stock', 'last_restock_amount', 'days_since_last_restock',
-        'wirkstoff_stock',  # Combined ingredient stock
-        'trend', 'seasonal', 'residual'  # Prophet features
+        'wirkstoff_stock', 'trend', 'seasonal',
     ]
 
-    # Separating features and target variable
+    # Separate features and target variable for training
     X_train = training_df[features]
     y_train = training_df['shortage_level']
-    X_test = testing_df[features]
-    y_test = testing_df['shortage_level']
 
-    # Normalization / Standardization for Linear Regression and SVM
+    # Normalize / Standardize features for models requiring scaling
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train)
-    X_test_scaled = scaler.transform(X_test)
 
     # Model Definitions
     models = {
@@ -43,7 +57,7 @@ def train_and_evaluate_models(db_manager):
         "SVM": SVR()
     }
 
-    # Hyperparameter grids
+    # Updated Hyperparameter grids
     param_grids = {
         "Linear Regression": {
             "fit_intercept": [True, False]
@@ -53,34 +67,44 @@ def train_and_evaluate_models(db_manager):
             "learning_rate": [0.01, 0.1, 0.3],
             "max_depth": [3, 6, 10],
             "subsample": [0.7, 0.8, 1.0],
-            "colsample_bytree": [0.7, 0.8, 1.0]
+            "colsample_bytree": [0.7, 0.8, 1.0],
+            "alpha": [0.1, 0.5, 1.0],
+            "lambda": [2, 5, 10]
         },
         "SVM": {
-            "C": [0.1, 1, 10],
+            "C": [0.01, 0.1, 1],
             "epsilon": [0.01, 0.1, 0.5],
             "kernel": ['linear', 'rbf'],
-            "gamma": ['scale', 'auto', 0.1]
+            "gamma": ['scale', 0.1, 0.01]
         }
     }
 
-    # GridSearch for each model
-    for model_name in models:
-        print(f"Tuning {model_name}...")
+    mse_scores = {}
 
-        model = models[model_name]
+    # GridSearch for the best model
+    for model_name, model in models.items():
+        print(f"Tuning {model_name}...")
         param_grid = param_grids[model_name]
 
         grid_search = GridSearchCV(model, param_grid, cv=5, n_jobs=-1, scoring='neg_mean_squared_error')
         grid_search.fit(X_train_scaled, y_train)
 
         print(f"Best parameters for {model_name}: {grid_search.best_params_}")
-
-        # Best model
         best_model = grid_search.best_estimator_
 
-        # Prediction
-        y_pred = best_model.predict(X_test_scaled)
-        mse = mean_squared_error(y_test, y_pred)
-        print(f"{model_name} MSE: {mse}")
+        # Evaluate on different time horizons
+        mse_12 = evaluate_model(testing_df, features, scaler, best_model, months=12)
+        mse_24 = evaluate_model(testing_df, features, scaler, best_model, months=24)
+        mse_36 = evaluate_model(testing_df, features, scaler, best_model, months=36)
 
-    return grid_search.best_params_
+        # Save model and MSEs in the scores dictionary
+        mse_scores[model_name] = {
+            "model": best_model,
+            "mse_12": mse_12,
+            "mse_24": mse_24,
+            "mse_36": mse_36
+        }
+
+    return mse_scores
+
+

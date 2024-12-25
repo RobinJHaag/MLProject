@@ -76,3 +76,60 @@ class Plotter:
 
         self.df.to_csv(file_path, index=False)
 
+    def plot_mse_line_chart(self, mse_scores, file_name="mse_line_chart.png"):
+        """
+        Plot a line chart comparing MSE scores across models and time horizons.
+        """
+        # Extract data for plotting
+        horizons = [12, 24]
+        models = mse_scores.keys()
+        colors = ['#FF4500', '#800080', '#40E0D0']  # Sunset orange, purple, turquoise
+
+        plt.figure(figsize=(12, 6))
+
+        # Plot each model's MSE across horizons
+        for model, color in zip(models, colors):
+            mse_values = [mse_scores[model][f'mse_{horizon}'] for horizon in horizons]
+            plt.plot(horizons, mse_values, label=model, color=color, marker='o', linestyle='-', linewidth=2)
+
+        # Customize the plot
+        plt.title('MSE Comparison Across Time Horizons', fontsize=16)
+        plt.xlabel('Time Horizon (Months)', fontsize=14)
+        plt.ylabel('Mean Squared Error', fontsize=14)
+        plt.xticks(horizons, fontsize=12)
+        plt.legend(fontsize=12, loc='upper left')
+        plt.grid(axis='y', linestyle='--', alpha=0.7)
+        plt.tight_layout()
+
+        # Save the plot
+        file_path = os.path.join(self.save_path, file_name)
+        plt.savefig(file_path)
+        plt.show()
+        plt.close()
+        print(f"MSE Line Chart saved as {file_path}.")
+
+    def plot_mse_bar_36(self, mse_scores, file_name="mse_bar_36_months.png"):
+        """
+        Plot a bar chart for the 36-month MSE to showcase XGBoost's outlier.
+        """
+        models = mse_scores.keys()
+        mse_36_values = [mse_scores[model].get('mse_36', None) for model in models]
+        colors = ['#FF4500', '#800080', '#40E0D0']  # Sunset orange, purple, turquoise
+
+        plt.figure(figsize=(8, 6))
+        plt.bar(models, mse_36_values, color=colors, alpha=0.8)
+        plt.title('MSE Comparison at 36-Month Horizon', fontsize=16)
+        plt.xlabel('Models', fontsize=14)
+        plt.ylabel('Mean Squared Error', fontsize=14)
+        plt.grid(axis='y', linestyle='--', alpha=0.7)
+        plt.tight_layout()
+
+        # Save the plot
+        file_path = os.path.join(self.save_path, file_name)
+        plt.savefig(file_path)
+        plt.show()
+        plt.close()
+        print(f"MSE Bar Chart for 36 months saved as {file_path}.")
+
+
+
