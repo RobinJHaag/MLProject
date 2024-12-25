@@ -33,7 +33,7 @@ class DataSimulator:
         seasonality = {
             'January': 1.2, 'February': 1.1, 'March': 1.0, 'April': 0.9, 'May': 0.8,
             'June': 0.6, 'July': 0.7, 'August': 0.7, 'September': 0.8,
-            'October': 1.0, 'November': 1.2, 'December': 1.3
+            'October': 1.0, 'November': 1.3, 'December': 1.4
         }
 
         dates = pd.date_range(start='2024-01-01', periods=self.simulation_time_span, freq='MS')
