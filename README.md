@@ -3,7 +3,7 @@
 
 Diese Simulation modelliert aus der Perspektive des Schweizer Staates die Produktion, den Verkauf und das Bestandsmanagement eines wichtigen Medikaments auf nationaler Ebene über einen Zeitraum von 48 Monaten. Sie dient als Prototyp, um Engpässe frühzeitig zu erkennen und effektiver darauf reagieren zu können.
 
-Das Ziel der Simulation ist es, dem Schweizer Staat zu ermöglichen, mithilfe von maschinellem Lernen zukünftige Knappheiten vorherzusagen. Dadurch können Maßnahmen früher eingeleitet und die Versorgungssicherheit der Bevölkerung verbessert werden.
+Das Ziel der Simulation ist es, dem Schweizer Staat zu ermöglichen, mithilfe von maschinellem Lernen zukünftige Knappheiten vorherzusagen. Dadurch können Massnahmen früher eingeleitet und die Versorgungssicherheit der Bevölkerung verbessert werden.
 
 ## Ziele der Simulation
 
