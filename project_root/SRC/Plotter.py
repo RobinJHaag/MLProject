@@ -76,60 +76,64 @@ class Plotter:
 
         self.df.to_csv(file_path, index=False)
 
-    def plot_mse_line_chart(self, mse_scores, file_name="mse_line_chart.png"):
+    def plot_mse_by_horizon(self, mse_scores, file_name="mse_by_horizon.png"):
         """
-        Plot a line chart comparing MSE scores across models and time horizons.
+        Plot MSE values across different horizons (3, 6, 12 months) for each model.
         """
-        # Extract data for plotting
-        horizons = [12, 24]
-        models = mse_scores.keys()
-        colors = ['#FF4500', '#800080', '#40E0D0']  # Sunset orange, purple, turquoise
+        horizons = ['mse_3', 'mse_6', 'mse_12']
+        models = list(mse_scores.keys())
 
-        plt.figure(figsize=(12, 6))
+        # Prepare data for plotting
+        data = {model: [mse_scores[model][horizon] for horizon in horizons] for model in models}
 
-        # Plot each model's MSE across horizons
-        for model, color in zip(models, colors):
-            mse_values = [mse_scores[model][f'mse_{horizon}'] for horizon in horizons]
-            plt.plot(horizons, mse_values, label=model, color=color, marker='o', linestyle='-', linewidth=2)
+        # Define colors in lavender tones
+        colors = {
+            "Linear Regression": "#b19cd9",  # Lavender
+            "XGBoost": "#9370db",  # Medium Purple
+            "SVM": "#8a2be2"  # Blue Violet
+        }
 
-        # Customize the plot
-        plt.title('MSE Comparison Across Time Horizons', fontsize=16)
-        plt.xlabel('Time Horizon (Months)', fontsize=14)
-        plt.ylabel('Mean Squared Error', fontsize=14)
-        plt.xticks(horizons, fontsize=12)
-        plt.legend(fontsize=12, loc='upper left')
-        plt.grid(axis='y', linestyle='--', alpha=0.7)
+        plt.figure(figsize=(10, 6))
+        for model, values in data.items():
+            plt.plot(horizons, values, marker='o', label=model, color=colors.get(model, "#9370db"))
+
+        plt.title("MSE Across Different Horizons", fontsize=14)
+        plt.xlabel("Horizon", fontsize=12)
+        plt.ylabel("Mean Squared Error (MSE)", fontsize=12)
+        plt.legend(title="Models", fontsize=10)
+        plt.grid(True, linestyle='--', alpha=0.7)
         plt.tight_layout()
 
-        # Save the plot
         file_path = os.path.join(self.save_path, file_name)
         plt.savefig(file_path)
         plt.show()
-        plt.close()
-        print(f"MSE Line Chart saved as {file_path}.")
+        print(f"MSE by Horizon plot saved as {file_path}.")
 
-    def plot_mse_bar_36(self, mse_scores, file_name="mse_bar_36_months.png"):
+    def plot_average_mse(self, mse_scores, file_name="average_mse.png"):
         """
-        Plot a bar chart for the 36-month MSE to showcase XGBoost's outlier.
+        Plot average MSE values across all horizons for each model.
         """
-        models = mse_scores.keys()
-        mse_36_values = [mse_scores[model].get('mse_36', None) for model in models]
-        colors = ['#FF4500', '#800080', '#40E0D0']  # Sunset orange, purple, turquoise
+        models = list(mse_scores.keys())
+        averages = [sum([mse_scores[model][horizon] for horizon in ['mse_3', 'mse_6', 'mse_12']]) / 3 for model in
+                    models]
+
+        # Define colors in lavender tones
+        colors = ["#b19cd9", "#9370db", "#8a2be2"]
 
         plt.figure(figsize=(8, 6))
-        plt.bar(models, mse_36_values, color=colors, alpha=0.8)
-        plt.title('MSE Comparison at 36-Month Horizon', fontsize=16)
-        plt.xlabel('Models', fontsize=14)
-        plt.ylabel('Mean Squared Error', fontsize=14)
+        plt.bar(models, averages, color=colors)
+        plt.title("Average MSE Across All Horizons", fontsize=14)
+        plt.xlabel("Models", fontsize=12)
+        plt.ylabel("Average Mean Squared Error (MSE)", fontsize=12)
         plt.grid(axis='y', linestyle='--', alpha=0.7)
         plt.tight_layout()
 
-        # Save the plot
         file_path = os.path.join(self.save_path, file_name)
         plt.savefig(file_path)
         plt.show()
-        plt.close()
-        print(f"MSE Bar Chart for 36 months saved as {file_path}.")
+        print(f"Average MSE plot saved as {file_path}.")
+
+
 
 
 
